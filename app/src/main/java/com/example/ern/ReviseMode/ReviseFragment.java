@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.ern.R;
+import com.example.ern.TranslationPopup;
 
 public class ReviseFragment extends Fragment {
 
@@ -30,16 +31,6 @@ public class ReviseFragment extends Fragment {
     }
 
     public void showRevisePopupWindowOnClick(View view) {
-        LayoutInflater inflater = (LayoutInflater) this.getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.translation_popup, null);
-
-        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
-        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        boolean focusable = true;
-        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-        popupView.setOnClickListener((View v) -> popupWindow.dismiss());
+        TranslationPopup.showPopupWindow("Librum", "Ipsus", view); // Placeholder.
     }
 }
