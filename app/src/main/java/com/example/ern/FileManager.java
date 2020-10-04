@@ -31,6 +31,7 @@ public final class FileManager {
 
     public static final String DATA = "data";
 
+    // Not sure this is needed.
     public static void checkDatabase(Context context) {
         try {
             File file = new File(context.getFilesDir(), DATA);
@@ -69,15 +70,7 @@ public final class FileManager {
         }
     }
 
-    public static void addData(Context context, String contents) {
-        try (FileOutputStream fos = context.openFileOutput(DATA, Context.MODE_PRIVATE | Context.MODE_APPEND)) {
-            fos.write(contents.getBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void writeData(Context context, String contents) {
+    private static void writeData(Context context, String contents) {
         Log.d("FILE_MANAGER", contents);
         try (FileOutputStream fos = context.openFileOutput(DATA, Context.MODE_PRIVATE)) {
             fos.write(contents.getBytes());
@@ -86,7 +79,7 @@ public final class FileManager {
         }
     }
 
-    public static String readData(Context context) {
+    private static String readData(Context context) {
         StringBuilder stringBuilder = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(context.openFileInput(DATA), StandardCharsets.UTF_8))) {

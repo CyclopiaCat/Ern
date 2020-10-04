@@ -1,15 +1,11 @@
 package com.example.ern.ReviseMode;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -18,13 +14,12 @@ import com.example.ern.MainActivity;
 import com.example.ern.R;
 import com.example.ern.TranslationPopup;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class ReviseFragment extends Fragment {
+
+    private static String REVISE = "REVISE";
 
     private View rootView;
     private ArrayList<TreeMap<String, String>> currentSession;
@@ -35,45 +30,59 @@ public class ReviseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.revise_mode, container, false);
-        Button button = rootView.findViewById(R.id.revise_mode_check);
+        Button button_check = rootView.findViewById(R.id.revise_mode_check);
+        Button button_next = rootView.findViewById(R.id.revise_mode_next);
         kanji = rootView.findViewById(R.id.revise_mode_kanji);
-        Log.d("REVISE", kanji.toString());
 
-        button.setOnClickListener(this::showRevisePopupWindowOnClick);
+        button_check.setOnClickListener(this::onCheckButtonClick);
+        button_next.setOnClickListener(this::onNextButtonClick);
+
         return rootView;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        closeSession();
+        exitSession();
     }
 
     public void enterSession(ArrayList<TreeMap<String, String>> array) {
         currentSession = array;
         sessionProgress = 0;
         inProgress = array.size() > 0;
-        if (inProgress) try {
-            kanji.setText(currentSession.get(0).get("Kanji"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (inProgress) setKanji();
     }
 
-    public void closeSession() {
-        ((MainActivity) getActivity()).updateTranslations(currentSession, sessionProgress);
+    public void exitSession() {
+        ((MainActivity) getActivity()).updateAndWriteTranslations(currentSession, sessionProgress);
     }
 
-    public void showRevisePopupWindowOnClick(View view) {
+    private void onCheckButtonClick(View view) {
         try {
             if (inProgress) {
                 TreeMap<String, String> currentTranslation = currentSession.get(sessionProgress);
                 TranslationPopup.showPopupWindow(currentTranslation.get("Kanji"), currentTranslation.get("Translation"), view);
-                if (++sessionProgress >= currentSession.size()) inProgress = false;
-                else kanji.setText(currentSession.get(sessionProgress).get("Kanji"));
+                nextTranslation();
             } else {
                 TranslationPopup.showPopupWindow("Revise Mode:", "OVER", view);
             }
         } catch (Exception ignored) {}
+    }
+
+    private void onNextButtonClick(View view) {
+        try {
+            TreeMap<String, String> currentTranslation = currentSession.get(sessionProgress);
+            currentTranslation.put("Successes", String.valueOf(Integer.parseInt(currentTranslation.get("Successes")) + 1));
+            nextTranslation();
+        } catch (Exception ignored) {}
+    }
+
+    private void setKanji() {
+        kanji.setText(currentSession.get(sessionProgress).get("Kanji"));
+    }
+
+    private void nextTranslation() {
+        if (++sessionProgress >= currentSession.size()) inProgress = false;
+        else setKanji();
     }
 }

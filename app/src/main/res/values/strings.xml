@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Ern</string>
+    <string name="button_check">Check</string>
+    <string name="button_next">Next</string>
+    <string name="librum">Librum</string>
+    <string name="button_wipe">Wipe</string>
+    <string name="button_search">Search</string>
+    <string name="ipsus">Ipsus</string>
 </resources>

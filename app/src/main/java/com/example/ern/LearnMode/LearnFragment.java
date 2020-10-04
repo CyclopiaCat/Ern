@@ -1,6 +1,8 @@
 package com.example.ern.LearnMode;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
@@ -48,23 +50,38 @@ public class LearnFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.learn_mode, container, false);
-        Button button = rootView.findViewById(R.id.learn_mode_search);
+        Button search_button = rootView.findViewById(R.id.learn_mode_search);
+        Button wipe_button = rootView.findViewById(R.id.learn_mode_wipe);
         EditText text = rootView.findViewById(R.id.learn_mode_type);
 
-        button.setOnClickListener(v -> {
+        search_button.setOnClickListener(v -> {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(text.getWindowToken(), 0);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<String> translationFuture = executor.submit(() -> queryWiktionaryGetString(text.getText().toString()));
             try {
                 String kanji = text.getText().toString();
-                String translation = translationFuture.get();            //TODO: remove this
-                TranslationPopup.showPopupWindow(kanji, translation, v); // This crap freezes the app when no connection.
-                ((MainActivity) getActivity()).addTranslation(kanji, translation); // Not aesthetic.
+                String translation = translationFuture.get();
+                TranslationPopup.showPopupWindow(kanji, translation, v);
+                ((MainActivity) getActivity()).addTranslation(kanji, translation);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
+        wipe_button.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+            builder.setCancelable(true);
+            builder.setTitle("Wipe");
+            builder.setMessage("Are you sure you want to wipe all the translations data?");
+            builder.setPositiveButton("Confirm", (dialog, which) -> ((MainActivity) getActivity()).wipeTranslationsAndData());
+            builder.setNegativeButton("Cancel", ((dialog, which) -> {}));
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        });
+
         return rootView;
     }
 
@@ -78,12 +95,9 @@ public class LearnFragment extends Fragment {
         return sb.toString();
     }
 
-    public String queryWiktionaryGetString(String text) throws IOException {
+    public String queryWiktionaryGetString(String text) {
         HttpURLConnection urlConnection = null;
         String translation = null;
-        if (!LearnConnection.isNetworkAvailable(getActivity())) {
-            throw new IOException("NO DAMN NETWORK DAMMIT!");
-        }
         try {
             URL url = new URL("https://ja.wiktionary.org/w/api.php?action=query&format=json&prop=extracts&titles=" + text);
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -97,7 +111,8 @@ public class LearnFragment extends Fragment {
         return translation;
     }
 
-    public String parseWiktionaryString(String text) throws UnsupportedEncodingException {
+    //TODO: fix this or change API.
+    public String parseWiktionaryString(String text) {
         String ret = null;
         Matcher m = Pattern.compile("n<ol><li>.*?</li>").matcher(text);
         if (m.find()) ret = m.group();

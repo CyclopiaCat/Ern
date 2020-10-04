@@ -1,5 +1,7 @@
 package com.example.ern;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MotionEventCompat;
@@ -27,15 +29,19 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +52,8 @@ import static org.apache.commons.lang3.math.NumberUtils.max;
 //TODO: clean up, comment, scope manage.
 
 public class MainActivity extends AppCompatActivity {
+
+    private static String TRANSLATIONS = "TRANSLATIONS";
 
     private enum Current {
         LEARN,
@@ -81,10 +89,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        FileManager.writeTranslations(this, translations);
+    public void wipeTranslationsAndData() {
+        translations = new ArrayList<>();
+        FileManager.writeTranslations(this, new ArrayList<>());
     }
 
     public void addTranslation(String kanji, String translation) {
@@ -92,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             TreeMap<String, String> entry = new TreeMap<>();
             entry.put("Kanji", kanji);
             entry.put("Translation", translation);
-            entry.put("Date", new Date().toString());
+            entry.put("Date", new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.US).format(new Date()));
             entry.put("Successes", "0");
             translations.add(entry);
             Log.d("TRANSLATIONS", translations.toString());
@@ -101,23 +108,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateTranslations(ArrayList<TreeMap<String, String>> array, int progress) {
-        for (int i = 0; i < progress; i++) {
-            translations.set(i, array.get(i));
-        }
-        translations.sort(new Comparator<TreeMap<String, String>>() {
-            @Override
-            public int compare(TreeMap<String, String> t1, TreeMap<String, String> t2) {
-                return getTranslationPriority(t1) - getTranslationPriority(t2);
-            }
-        });
+    public void updateAndWriteTranslations(ArrayList<TreeMap<String, String>> array, int progress) {
+        translations.sort((t1, t2) -> getTranslationPriority(t1) - getTranslationPriority(t2));
+        FileManager.writeTranslations(this, translations);
     }
 
+    @SuppressWarnings("ConstantConditions")
     private int getTranslationPriority(TreeMap<String, String> translation) {
         DateFormat date = DateFormat.getDateInstance();
         try {
-            return (int)max((long)Math.pow(2, Integer.parseInt(translation.get("Successes")))  // This, kinda ugly.
-                                       - date.parse(translation.get("Date")).getTime() / 80000 - 1, 0); //TODO: make this better.
+            return -max(1 << Integer.parseInt(translation.get("Successes")) - date.parse(translation.get("Date")).getTime() / 80000 - 1,
+                        0);                           //TODO: make this better.
         } catch (Exception e) {
             e.printStackTrace();
         }
