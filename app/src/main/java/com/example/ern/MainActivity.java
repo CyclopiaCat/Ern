@@ -81,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        FileManager.writeTranslations(this, translations);
+    }
+
     public void addTranslation(String kanji, String translation) {
         try {
             TreeMap<String, String> entry = new TreeMap<>();

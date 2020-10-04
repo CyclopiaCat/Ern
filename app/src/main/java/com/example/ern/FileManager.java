@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -43,21 +44,29 @@ public final class FileManager {
     public static ArrayList<TreeMap<String, String>> readTranslations(Context context) {
         try {
             String translations = readData(context);
+            Log.d("FILE_MANAGER", translations);
             if (translations.length() == 0) {
-                Log.d("FILE_MANAGER", "File was empty.");
                 return new ArrayList<>();
             }
             else {
                 Gson gson = new Gson();
                 Type type = new TypeToken<ArrayList<TreeMap<String, String>>>(){}.getType();
-                return gson.fromJson(readData(context), type);
+                ArrayList<TreeMap<String, String>> ret = gson.fromJson(translations, type);
+                return ret;
             }
-        } catch (Exception ignored) {}
-        return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     public static void writeTranslations(Context context, ArrayList<TreeMap<String, String>> translations) {
-        writeData(context, translations.toString());
+        try {
+            Gson gson = new Gson();
+            writeData(context, gson.toJson(translations));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void addData(Context context, String contents) {
@@ -69,6 +78,7 @@ public final class FileManager {
     }
 
     public static void writeData(Context context, String contents) {
+        Log.d("FILE_MANAGER", contents);
         try (FileOutputStream fos = context.openFileOutput(DATA, Context.MODE_PRIVATE)) {
             fos.write(contents.getBytes());
         } catch (Exception e) {
