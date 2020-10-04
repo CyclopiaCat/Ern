@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.ern.FileManager;
+import com.example.ern.MainActivity;
 import com.example.ern.R;
 import com.example.ern.TranslationPopup;
 
@@ -53,36 +55,17 @@ public class LearnFragment extends Fragment {
             InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(text.getWindowToken(), 0);
             ExecutorService executor = Executors.newSingleThreadExecutor();
-//            Future<JSONObject> json = executor.submit(() -> queryJishoGetJson(text.getText().toString()));
-//            try {
-//                TranslationPopup.showPopupWindow(text.getText().toString(), parseJishoJson(json.get()), v); // This crap freezes the app when no connection.
-            Future<String> translation = executor.submit(() -> queryWiktionaryGetString(text.getText().toString()));
+            Future<String> translationFuture = executor.submit(() -> queryWiktionaryGetString(text.getText().toString()));
             try {
-                TranslationPopup.showPopupWindow(text.getText().toString(), translation.get(), v);
-            } catch (Exception e) {                                                                         //TODO: remove this
+                String kanji = text.getText().toString();
+                String translation = translationFuture.get();            //TODO: remove this
+                TranslationPopup.showPopupWindow(kanji, translation, v); // This crap freezes the app when no connection.
+                ((MainActivity) getActivity()).addTranslation(kanji, translation); // Not aesthetic.
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
         return rootView;
-    }
-
-    public JSONObject queryJishoGetJson(String text) throws IOException {
-        HttpURLConnection urlConnection = null;
-        JSONObject json = null;
-        if (!LearnConnection.isNetworkAvailable(getActivity())) {
-            throw new IOException("NO DAMN NETWORK DAMMIT!");
-        }
-        try {
-            URL url = new URL("https://jisho.org/api/v1/search/words?keyword=" + text);
-            urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            json = new JSONObject(readStream(in));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (urlConnection != null) urlConnection.disconnect();
-        }
-        return json;
     }
 
     private String readStream(InputStream is) throws IOException {
@@ -93,13 +76,6 @@ public class LearnFragment extends Fragment {
         }
         is.close();
         return sb.toString();
-    }
-
-    private String parseJishoJson(JSONObject json) throws JSONException {
-        Log.d("JSON", json.toString());
-        String english_meanings = json.getJSONArray("data").getJSONObject(0).getJSONArray("senses")
-                                      .getJSONObject(0).getJSONArray("english_definitions").toString(2);
-        return english_meanings;
     }
 
     public String queryWiktionaryGetString(String text) throws IOException {
@@ -127,6 +103,7 @@ public class LearnFragment extends Fragment {
         if (m.find()) ret = m.group();
         else return null;
         ret = StringEscapeUtils.unescapeJava(ret);
+        ret = ret.substring(9, ret.length() - 5);
         Log.d("WIKTIONARY", ret);
         return ret;
     }
