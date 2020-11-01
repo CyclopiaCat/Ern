@@ -1,7 +1,6 @@
 package com.example.ern.ReviseMode;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +24,14 @@ public class ReviseFragment extends Fragment {
     private ArrayList<TreeMap<String, String>> currentSession;
     private int sessionProgress;
     private boolean inProgress;
-    private TextView kanji;
+    private TextView expression;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.revise_mode, container, false);
         Button button_check = rootView.findViewById(R.id.revise_mode_check);
         Button button_next = rootView.findViewById(R.id.revise_mode_next);
-        kanji = rootView.findViewById(R.id.revise_mode_kanji);
+        expression = rootView.findViewById(R.id.revise_mode_kanji);
 
         button_check.setOnClickListener(this::onCheckButtonClick);
         button_next.setOnClickListener(this::onNextButtonClick);
@@ -54,14 +53,15 @@ public class ReviseFragment extends Fragment {
     }
 
     public void exitSession() {
-        ((MainActivity) getActivity()).updateAndWriteTranslations(currentSession, sessionProgress);
+        ((MainActivity) getActivity()).updateAndWriteTranslations();
     }
 
     private void onCheckButtonClick(View view) {
         try {
             if (inProgress) {
                 TreeMap<String, String> currentTranslation = currentSession.get(sessionProgress);
-                TranslationPopup.showPopupWindow(currentTranslation.get("Kanji"), currentTranslation.get("Translation"), view);
+                TranslationPopup.showPopupWindow(currentTranslation.get("Expression"),
+                                                 currentTranslation.get("Translation"), view);
                 nextTranslation();
             } else {
                 TranslationPopup.showPopupWindow("Revise Mode:", "OVER", view);
@@ -78,7 +78,7 @@ public class ReviseFragment extends Fragment {
     }
 
     private void setKanji() {
-        kanji.setText(currentSession.get(sessionProgress).get("Kanji"));
+        expression.setText(currentSession.get(sessionProgress).get("Expression"));
     }
 
     private void nextTranslation() {

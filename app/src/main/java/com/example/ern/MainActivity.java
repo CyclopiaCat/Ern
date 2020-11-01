@@ -38,6 +38,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
@@ -46,6 +47,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static org.apache.commons.lang3.math.NumberUtils.max;
 
@@ -94,31 +96,40 @@ public class MainActivity extends AppCompatActivity {
         FileManager.writeTranslations(this, new ArrayList<>());
     }
 
-    public void addTranslation(String kanji, String translation) {
+    // If the check is slow, move somewhere else.
+    public void addTranslation(String expression, String translation) {
         try {
             TreeMap<String, String> entry = new TreeMap<>();
-            entry.put("Kanji", kanji);
+            entry.put("Expression", expression);
             entry.put("Translation", translation);
             entry.put("Date", new SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.US).format(new Date()));
             entry.put("Successes", "0");
             translations.add(entry);
-            Log.d("TRANSLATIONS", translations.toString());
+            Log.d(TRANSLATIONS, translations.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void updateAndWriteTranslations(ArrayList<TreeMap<String, String>> array, int progress) {
+    public void updateAndWriteTranslations() {
         translations.sort((t1, t2) -> getTranslationPriority(t1) - getTranslationPriority(t2));
+        writeTranslations();
+    }
+
+    public void writeTranslations() {
         FileManager.writeTranslations(this, translations);
     }
 
+    // max(2^Successes - Days - 1, 0)
     @SuppressWarnings("ConstantConditions")
     private int getTranslationPriority(TreeMap<String, String> translation) {
         DateFormat date = DateFormat.getDateInstance();
         try {
-            return -max(1 << Integer.parseInt(translation.get("Successes")) - date.parse(translation.get("Date")).getTime() / 80000 - 1,
-                        0);                           //TODO: make this better.
+            int max = (int) max((1 << Integer.parseInt(translation.get("Successes")))
+                            - TimeUnit.DAYS.convert(new Date().getTime() - date.parse(translation.get("Date")).getTime(), TimeUnit.MILLISECONDS) - 1,
+                    0);
+            Log.d(TRANSLATIONS, translation.get("Successes") + ", " + translation.get("Date") + " -> " + max + "\n" + (1 << Integer.parseInt(translation.get("Successes"))));
+            return max;
         } catch (Exception e) {
             e.printStackTrace();
         }
