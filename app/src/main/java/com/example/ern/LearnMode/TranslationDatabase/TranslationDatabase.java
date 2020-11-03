@@ -1,23 +1,20 @@
-package com.example.ern.LearnMode;
+package com.example.ern.LearnMode.TranslationDatabase;
 
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
-
-import com.example.ern.MainActivity;
 
 @Database(entities = Translation.class, version = 1, exportSchema = false)
 @TypeConverters({TranslationDatabaseConverters.class})
 public abstract class TranslationDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "translations.sqlite";
+    private static final String FILE_NAME = "translations.db";
     private static volatile TranslationDatabase instance;
 
     public static synchronized TranslationDatabase getInstance(Context context) {
@@ -29,9 +26,8 @@ public abstract class TranslationDatabase extends RoomDatabase {
 
     public static void init(Context context) {
         instance = Room.databaseBuilder(context, TranslationDatabase.class, DB_NAME)
-                       .createFromAsset("translations.db")
+                       .createFromAsset(FILE_NAME)
                        .build();
-        Log.d("WORKS", "yep");
     }
 
     abstract public TranslationDao translationDao();

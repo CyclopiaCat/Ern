@@ -1,8 +1,6 @@
-package com.example.ern.LearnMode;
+package com.example.ern.LearnMode.TranslationDatabase;
 
 import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 @Dao
@@ -13,6 +11,7 @@ public interface TranslationDao {
     @Query("select * from Translations where romajiExpression = :romajiExpression")
     Translation[] getTranslationsByRomaji(String romajiExpression);
 
-    @Query("select * from Translations limit 4")
-    Translation[] getSomething();
+    // For debug.
+    @Query("select * from Translations limit :n")
+    Translation[] getSomething(int n);
 }

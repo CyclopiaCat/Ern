@@ -1,4 +1,4 @@
-package com.example.ern.LearnMode;
+package com.example.ern.LearnMode.TranslationDatabase;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -11,6 +11,4 @@ public class Translation {
     public String kanjiExpression;
     public String romajiExpression;
     public String[] translations;
-
-
 }

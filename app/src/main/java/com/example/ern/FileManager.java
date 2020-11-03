@@ -29,6 +29,7 @@ import java.util.TreeMap;
 
 public final class FileManager {
 
+    private static final String FILE_MANAGER = "FILE_MANAGER";
     public static final String DATA = "data";
 
     // Not sure this is needed.
@@ -45,7 +46,7 @@ public final class FileManager {
     public static ArrayList<TreeMap<String, String>> readTranslations(Context context) {
         try {
             String translations = readData(context);
-            Log.d("FILE_MANAGER", translations);
+            Log.d(FILE_MANAGER, translations);
             if (translations.length() == 0) {
                 return new ArrayList<>();
             }
@@ -71,7 +72,7 @@ public final class FileManager {
     }
 
     private static void writeData(Context context, String contents) {
-        Log.d("FILE_MANAGER", contents);
+        Log.d(FILE_MANAGER, contents);
         try (FileOutputStream fos = context.openFileOutput(DATA, Context.MODE_PRIVATE)) {
             fos.write(contents.getBytes());
         } catch (Exception e) {

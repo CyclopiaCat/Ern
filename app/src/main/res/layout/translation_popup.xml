@@ -37,7 +37,7 @@
             android:layout_height="180dp"
             android:autoSizeTextType="uniform"
             android:autoSizeMinTextSize="12sp"
-            android:autoSizeMaxTextSize="100sp"
+            android:autoSizeMaxTextSize="30sp"
             android:autoSizeStepGranularity="2sp"
             android:gravity="center"
             android:text="@string/ipsus"
