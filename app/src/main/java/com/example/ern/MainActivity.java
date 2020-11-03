@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         REVISE
     }
 
+    public static final String INVALID_INPUT = "Nothing was found with this query. Please try again.";
+
     private Current fragment;
     private ArrayList<TreeMap<String, String>> translations;
 
@@ -69,6 +71,10 @@ public class MainActivity extends AppCompatActivity {
     // This is and should be the only method that adds any entries. Thus, it should not generate errors and invalid entries.
     public void addTranslation(String expression, String translation) {
         try {
+            if (translation.equals(INVALID_INPUT)) {
+                Log.d(TRANSLATIONS, "Translation body was empty. Ignored.");
+                return;
+            }
             // Update the existing entry if it exists.
             for (TreeMap<String, String> entry : translations) {
                 if (entry.get("Expression").equals(expression)) {
