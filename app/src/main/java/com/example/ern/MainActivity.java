@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void switchToReviseIfLearn() {
         if (fragment == Current.REVISE) return;
+
         ReviseFragment reviseFragment = new ReviseFragment();
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                                    .replace(R.id.content_frame, reviseFragment).commit();

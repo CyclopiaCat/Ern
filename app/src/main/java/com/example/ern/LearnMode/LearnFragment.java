@@ -81,6 +81,7 @@ public class LearnFragment extends Fragment {
     //TODO: probably have to use some library to discern kana.
     private String getStringFromDatabase(String text) {
         Translation[] ts = TranslationDatabase.getInstance(getActivity()).translationDao().getTranslationsByKanji(text);
+        String ret = "";
         if (ts.length == 0) {
             ts = TranslationDatabase.getInstance(getActivity()).translationDao().getTranslationsByRomaji(text);
             if (ts.length == 0) {
@@ -91,10 +92,12 @@ public class LearnFragment extends Fragment {
         }
         else {
             Log.d(LEARN, "Probably kanji");
+            ret = ret.concat(ts[0].romajiExpression + "\n");
         }
         Log.d(LEARN, String.valueOf(ts.length));
-        String ret = "";
-        for (int i = 0; i < ts[0].translations.length; i++) ret = ret.concat(String.valueOf(i + 1)+". "+ts[0].translations[i]+"\n");
+        for (int i = 0; i < ts[0].translations.length; i++) {
+            ret = ret.concat(String.valueOf(i + 1) + ". " + ts[0].translations[i] + (i == ts[0].translations.length - 1 ? "" : "\n"));
+        }
         return ret;
     }
 }
