@@ -5,13 +5,13 @@
     android:id="@+id/revise_mode"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#aaa"
+    android:background="@color/medium"
     tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/revise_mode_kanji"
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
+        android:layout_width="300dp"
+        android:layout_height="180dp"
         android:autoSizeTextType="uniform"
         android:autoSizeMinTextSize="12sp"
         android:autoSizeMaxTextSize="100sp"
@@ -19,34 +19,21 @@
         android:gravity="center"
         android:maxLines="1"
         android:text="@string/librum"
+        android:elevation="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.6" />
+        app:layout_constraintVertical_bias="0.5" />
 
-    <Button
+    <ImageButton
+        style="@style/ImageButtonStyle"
         android:id="@+id/revise_mode_check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="@string/button_check"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/revise_mode_next"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/revise_mode_kanji" />
-
-    <Button
-        android:id="@+id/revise_mode_next"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAllCaps="false"
-        android:text="@string/button_next"
-        android:textSize="30sp"
+        android:longClickable="true"
+        android:src="@drawable/ic_info"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/revise_mode_check"
-        app:layout_constraintTop_toBottomOf="@+id/revise_mode_kanji" />
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/revise_mode_kanji"
+        app:layout_constraintVertical_bias="0.25" />
 </androidx.constraintlayout.widget.ConstraintLayout>

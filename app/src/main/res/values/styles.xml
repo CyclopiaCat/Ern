@@ -2,10 +2,9 @@
 
 <!-- Base application theme. -->
 <style name="AppTheme" parent="Theme.AppCompat">
-    <!-- Customize your theme here. -->
-    <!--<item name="colorPrimary">@color/colorPrimary</item>-->
-    <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-    <!--<item name="colorAccent">@color/colorAccent</item>-->
+    <item name="android:textColor">@color/very_dark</item>
+    <item name="android:textSize">24sp</item>
+    <item name="android:imageButtonStyle">@style/ImageButtonStyle</item>
 </style>
 
 <style name="AppTheme.NoActionBar">
@@ -13,8 +12,13 @@
     <item name="windowNoTitle">true</item>
 </style>
 
-<style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-<style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+<style name="ImageButtonStyle">
+    <item name="android:scaleType">fitXY</item>
+    <item name="android:elevation">3dp</item>
+    <item name="android:layout_width">90dp</item>
+    <item name="android:layout_height">0dp</item>
+    <item name="android:background">@color/light</item>
+    <item name="layout_constraintDimensionRatio">w,1:1</item>
+</style>
 
 </resources>

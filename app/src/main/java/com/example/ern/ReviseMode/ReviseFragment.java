@@ -2,9 +2,11 @@ package com.example.ern.ReviseMode;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -29,12 +31,11 @@ public class ReviseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.revise_mode, container, false);
-        Button button_check = rootView.findViewById(R.id.revise_mode_check);
-        Button button_next = rootView.findViewById(R.id.revise_mode_next);
+        ImageButton button_check = rootView.findViewById(R.id.revise_mode_check);
         expression = rootView.findViewById(R.id.revise_mode_kanji);
 
         button_check.setOnClickListener(this::onCheckButtonClick);
-        button_next.setOnClickListener(this::onNextButtonClick);
+        rootView.setOnClickListener(this::onNextButtonClick);
 
         return rootView;
     }

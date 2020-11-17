@@ -3,9 +3,9 @@ package com.example.ern;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 
 import com.example.ern.LearnMode.LearnFragment;
 import com.example.ern.ReviseMode.ReviseFragment;
@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Current fragment;
     private ArrayList<TreeMap<String, String>> translations;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,15 +50,17 @@ public class MainActivity extends AppCompatActivity {
         fragment = Current.LEARN;
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, new LearnFragment()).commit();
 
-        View main = findViewById(R.id.main);
-        main.setOnTouchListener(new OnSwipeTouchListener(main.getContext()) {
+        MainFrame main = findViewById(R.id.content_frame);
+        main.setOnSwipeListener(new OnSwipeListener() {
             @Override
-            public void onSwipeLeft() {
-                switchToLearnIfRevise();
-            }
-            @Override
-            public void onSwipeRight() {
-                switchToReviseIfLearn();
+            public boolean onSwipe(Direction direction) {
+                if (direction == Direction.LEFT)
+                    switchToLearnIfRevise();
+                else if (direction == Direction.RIGHT)
+                    switchToReviseIfLearn();
+                else
+                    return false;
+                return true;
             }
         });
     }
@@ -67,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         FileManager.writeTranslations(this, new ArrayList<>());
     }
 
-    // If the check is slow, move somewhere else.
     // This is and should be the only method that adds any entries. Thus, it should not generate errors and invalid entries.
     public void addTranslation(String expression, String translation) {
         try {
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
     public void updateAndWriteTranslations() {
         translations.sort((t1, t2) -> getTranslationPriority(t1) - getTranslationPriority(t2));
         writeTranslations();
+        switchToLearnIfRevise();
     }
 
     public void writeTranslations() {
@@ -110,12 +113,13 @@ public class MainActivity extends AppCompatActivity {
     private int getTranslationPriority(TreeMap<String, String> translation) {
         DateFormat date = DateFormat.getDateInstance();
         try {
-            int max = (int) max((1 << Integer.parseInt(translation.get("Successes"))) - 1
-                           - TimeUnit.DAYS.convert(new Date().getTime() - date.parse(translation.get("Date")).getTime(),
-                                           TimeUnit.MILLISECONDS),
-                                0);
-            Log.d(TRANSLATIONS, translation.get("Successes") + ", " + translation.get("Date") + " -> " + max);
-            return max;
+            int s = Integer.parseInt(translation.get("Successes"));
+            int d = (int) TimeUnit.DAYS.convert(new Date().getTime() - date.parse(translation.get("Date")).getTime(),
+                          TimeUnit.MILLISECONDS);
+            int ret = (1 << s) - d;
+
+            Log.d(TRANSLATIONS, s + ", " + d + " -> " + ret);
+            return ret;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         ReviseFragment reviseFragment = new ReviseFragment();
         getSupportFragmentManager().beginTransaction().setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                                    .replace(R.id.content_frame, reviseFragment).commit();
+        updateAndWriteTranslations();
         getSupportFragmentManager().executePendingTransactions(); // enterSession misbehaves without this.
         reviseFragment.enterSession(translations);
         fragment = Current.REVISE;

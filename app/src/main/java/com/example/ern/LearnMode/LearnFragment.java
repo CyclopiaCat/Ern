@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.fragment.app.Fragment;
 
@@ -33,13 +34,12 @@ public class LearnFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.learn_mode, container, false);
-        Button search_button = rootView.findViewById(R.id.learn_mode_search);
-        Button wipe_button = rootView.findViewById(R.id.learn_mode_wipe);
+        ImageButton search_button = rootView.findViewById(R.id.learn_mode_search);
         searchText = rootView.findViewById(R.id.learn_mode_type);
 
         search_button.setOnClickListener(this::onSearchButtonClick);
 
-        wipe_button.setOnClickListener(this::onWipeButtonClick);
+        search_button.setOnLongClickListener(this::onWipeButtonClick);
 
         return rootView;
     }
@@ -65,7 +65,7 @@ public class LearnFragment extends Fragment {
         }
     }
 
-    private void onWipeButtonClick(View v) {
+    private boolean onWipeButtonClick(View v) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         builder.setCancelable(true);
@@ -76,6 +76,7 @@ public class LearnFragment extends Fragment {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+        return true;
     }
 
     //TODO: probably have to use some library to discern kana.
